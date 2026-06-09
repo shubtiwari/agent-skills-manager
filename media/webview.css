@@ -529,3 +529,390 @@ body {
     gap: var(--spacing-xs);
   }
 }
+
+/* ==========================================================
+   Table of Contents (TOC) Sidebar
+   ========================================================== */
+.has-toc {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--spacing-xl);
+  max-width: 1200px;
+  padding: var(--spacing-xl);
+}
+
+.toc-sidebar {
+  position: sticky;
+  top: var(--spacing-xl);
+  height: max-content;
+  max-height: calc(100vh - 4rem);
+  overflow-y: auto;
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  z-index: 10;
+}
+
+.toc-header {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.toc-list {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.toc-item {
+  margin-bottom: 2px !important;
+}
+
+.toc-link {
+  display: flex;
+  align-items: flex-start;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary) !important;
+  text-decoration: none !important;
+  font-size: 13px;
+  line-height: 1.4;
+  transition: all var(--duration-fast) var(--ease-out);
+  border: none !important;
+}
+
+.toc-link:hover {
+  background: rgba(120, 100, 255, 0.08);
+  color: var(--text-primary) !important;
+}
+
+.toc-link.active {
+  background: rgba(120, 100, 255, 0.15);
+  color: var(--text-primary) !important;
+  font-weight: 500;
+  box-shadow: inset 3px 0 0 var(--text-accent);
+}
+
+.toc-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 24px;
+  margin-right: 8px;
+  margin-top: 1px;
+}
+
+.toc-text {
+  flex: 1;
+}
+
+.skill-main-column {
+  min-width: 0;
+}
+
+/* ==========================================================
+   Header Actions & Edit Button
+   ========================================================== */
+.header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-sm);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  border: 1px solid transparent;
+}
+
+.edit-btn {
+  background: rgba(124, 58, 237, 0.15);
+  color: #c4b5fd;
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+.edit-btn:hover {
+  background: rgba(124, 58, 237, 0.25);
+  transform: translateY(-1px);
+}
+
+.version-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.version-btn:hover, .version-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+/* ==========================================================
+   Version History Panel
+   ========================================================== */
+.version-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  overflow: hidden;
+  animation: slideDown var(--duration-fast) var(--ease-out);
+}
+
+.version-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: rgba(120, 100, 255, 0.05);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.version-panel-title {
+  margin: 0 !important;
+  font-size: 14px !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.version-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+}
+
+.version-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.version-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.version-empty {
+  padding: var(--spacing-lg);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.version-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--duration-fast);
+}
+
+.version-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.version-item:last-child {
+  border-bottom: none;
+}
+
+.version-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.version-number {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-accent);
+  background: rgba(124, 58, 237, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.version-date {
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+.version-desc {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.version-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.version-actions button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-secondary);
+  transition: all 0.2s;
+}
+
+.version-actions button:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.version-restore-btn:hover {
+  border-color: rgba(239, 68, 68, 0.5) !important;
+  color: #fca5a5 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* ==========================================================
+   Skill Editor
+   ========================================================== */
+.editor-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.editor-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.editor-field {
+  margin-bottom: var(--spacing-lg);
+}
+
+.editor-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.editor-input,
+.editor-textarea {
+  width: 100%;
+  background: rgba(15, 16, 25, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 10px 14px;
+  transition: border-color var(--duration-fast);
+}
+
+.editor-textarea {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.editor-input:focus,
+.editor-textarea:focus {
+  outline: none;
+  border-color: var(--text-accent);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.2);
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  border: none;
+}
+
+.editor-btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.editor-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.editor-btn-primary {
+  background: var(--gradient-purple);
+  color: white;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+}
+
+.editor-btn-primary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4);
+}
+
+.editor-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Responsive TOC */
+@media (max-width: 900px) {
+  .has-toc {
+    grid-template-columns: 1fr;
+  }
+  
+  .toc-sidebar {
+    position: static;
+    max-height: 300px;
+    margin-bottom: var(--spacing-lg);
+  }
+}

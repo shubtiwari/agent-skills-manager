@@ -6,6 +6,7 @@
 
 /**
  * Convert markdown text to HTML.
+ * Headings get auto-generated `id` attributes for anchor linking.
  * @param {string} markdown
  * @returns {string}
  */
@@ -47,8 +48,10 @@ function renderMarkdown(markdown) {
     const headingMatch = line.match(/^(#{1,6})\s+(.*)/);
     if (headingMatch) {
       const level = headingMatch[1].length;
-      const text = processInline(headingMatch[2]);
-      htmlParts.push(`<h${level}>${text}</h${level}>`);
+      const rawText = headingMatch[2];
+      const text = processInline(rawText);
+      const slug = slugify(rawText);
+      htmlParts.push(`<h${level} id="${slug}">${text}</h${level}>`);
       i++;
       continue;
     }
@@ -111,6 +114,97 @@ function renderMarkdown(markdown) {
   }
 
   return htmlParts.join('\n');
+}
+
+/**
+ * Extract a Table of Contents from markdown content.
+ * Returns an array of TOC entries with hierarchical numbering.
+ * @param {string} markdown
+ * @returns {TocEntry[]}
+ */
+function extractToc(markdown) {
+  if (!markdown) return [];
+
+  const lines = markdown.split('\n');
+  const entries = [];
+  let inCodeBlock = false;
+
+  for (const line of lines) {
+    // Track code blocks to skip headings inside them
+    if (/^(`{3,}|~{3,})/.test(line)) {
+      inCodeBlock = !inCodeBlock;
+      continue;
+    }
+    if (inCodeBlock) continue;
+
+    const headingMatch = line.match(/^(#{1,6})\s+(.*)/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const text = headingMatch[2].replace(/[*_`~]/g, ''); // strip inline formatting for clean text
+      const slug = slugify(headingMatch[2]);
+      entries.push({ level, text, id: slug });
+    }
+  }
+
+  // Assign hierarchical index numbers
+  return assignHierarchicalIndices(entries);
+}
+
+/**
+ * Assign hierarchical numbering like 1, 1.1, 1.2, 2, 2.1, etc.
+ * @param {{ level: number, text: string, id: string }[]} entries
+ * @returns {TocEntry[]}
+ */
+function assignHierarchicalIndices(entries) {
+  if (entries.length === 0) return [];
+
+  // Find the minimum heading level (typically h1 or h2) to use as the root
+  const minLevel = Math.min(...entries.map(e => e.level));
+
+  // Counters for each depth level (up to 6 levels)
+  const counters = [0, 0, 0, 0, 0, 0];
+
+  return entries.map(entry => {
+    const depth = entry.level - minLevel; // 0-indexed depth
+
+    // Increment counter at this depth
+    counters[depth]++;
+
+    // Reset all deeper counters
+    for (let d = depth + 1; d < counters.length; d++) {
+      counters[d] = 0;
+    }
+
+    // Build hierarchical index string from counters[0..depth]
+    const indexParts = [];
+    for (let d = 0; d <= depth; d++) {
+      indexParts.push(counters[d]);
+    }
+    const index = indexParts.join('.');
+
+    return {
+      level: entry.level,
+      depth,
+      text: entry.text,
+      id: entry.id,
+      index
+    };
+  });
+}
+
+/**
+ * Generate a URL-friendly slug from heading text.
+ * @param {string} text
+ * @returns {string}
+ */
+function slugify(text) {
+  return text
+    .toLowerCase()
+    .replace(/[*_`~\[\]()]/g, '')    // strip markdown formatting chars
+    .replace(/[^\w\s-]/g, '')         // remove non-word chars
+    .replace(/\s+/g, '-')             // spaces to dashes
+    .replace(/-+/g, '-')              // collapse multiple dashes
+    .replace(/^-|-$/g, '');           // trim leading/trailing dashes
 }
 
 /**
@@ -239,4 +333,13 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-module.exports = { renderMarkdown, escapeHtml };
+module.exports = { renderMarkdown, extractToc, escapeHtml };
+
+/**
+ * @typedef {object} TocEntry
+ * @property {number} level - The heading level (1-6)
+ * @property {number} depth - 0-indexed depth relative to the minimum heading level
+ * @property {string} text - Plain text of the heading
+ * @property {string} id - Slugified ID for anchor linking
+ * @property {string} index - Hierarchical index like "1", "1.1", "2.3"
+ */

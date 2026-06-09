@@ -2,6 +2,8 @@ const vscode = require('vscode');
 const { SkillScanner } = require('./skillScanner');
 const { SkillsTreeProvider } = require('./skillsTreeProvider');
 const { SkillWebviewPanel } = require('./skillWebviewPanel');
+const { SkillEditorPanel } = require('./skillEditor');
+const { SkillCreator } = require('./skillCreator');
 
 /**
  * Output channel for extension logging.
@@ -40,7 +42,60 @@ async function activate(context) {
   context.subscriptions.push(
     vscode.commands.registerCommand('antigravity.viewSkill', (skillData, pluginData) => {
       if (skillData && pluginData) {
-        SkillWebviewPanel.show(context, skillData, pluginData);
+        SkillWebviewPanel.show(context, skillData, pluginData, (skillToEdit, pluginToEdit) => {
+          vscode.commands.executeCommand('antigravity.editSkill', { skillData: skillToEdit, pluginData: pluginToEdit });
+        });
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('antigravity.createSkill', async () => {
+      await SkillCreator.create(scanner, async () => {
+        await treeProvider.refresh();
+      });
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('antigravity.editSkill', (treeItem) => {
+      if (treeItem && treeItem.skillData && treeItem.pluginData) {
+        SkillEditorPanel.show(context, treeItem.skillData, treeItem.pluginData, async () => {
+          await treeProvider.refresh();
+          // Update the open webview panel with the latest data if it's open
+          vscode.commands.executeCommand('antigravity.viewSkill', treeItem.skillData, treeItem.pluginData);
+        });
+      }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('antigravity.deleteSkill', async (payload) => {
+      const skillData = payload.skillData;
+      if (skillData && skillData.filePath) {
+        const confirm = await vscode.window.showWarningMessage(
+          `Are you sure you want to delete the skill "${skillData.displayName}"? This action cannot be undone.`,
+          { modal: true },
+          'Delete'
+        );
+        
+        if (confirm === 'Delete') {
+          try {
+            const fs = require('fs');
+            const path = require('path');
+            const skillDir = path.dirname(skillData.filePath);
+            await fs.promises.rm(skillDir, { recursive: true, force: true });
+            
+            vscode.window.showInformationMessage(`Skill "${skillData.displayName}" deleted successfully.`);
+            await treeProvider.refresh();
+            
+            if (SkillWebviewPanel._currentPanel && SkillWebviewPanel._currentPanel._skillData.filePath === skillData.filePath) {
+              SkillWebviewPanel._currentPanel._dispose();
+            }
+          } catch (err) {
+            vscode.window.showErrorMessage(`Failed to delete skill: ${err.message}`);
+          }
+        }
       }
     })
   );
@@ -51,6 +106,12 @@ async function activate(context) {
         const uri = vscode.Uri.file(treeItem.skillData.filePath);
         vscode.window.showTextDocument(uri);
       }
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('antigravity.showSidebar', () => {
+      vscode.commands.executeCommand('antigravitySkillsTree.focus');
     })
   );
 
