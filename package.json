@@ -1,0 +1,81 @@
+{
+  "name": "antigravity-skills-viewer",
+  "displayName": "Antigravity Skills Viewer",
+  "description": "Browse and view the SKILL.md files used by Antigravity from your local system",
+  "version": "1.0.0",
+  "publisher": "antigravity-tools",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:antigravitySkillsTree"
+  ],
+  "main": "./src/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "antigravity-skills",
+          "title": "Antigravity Skills",
+          "icon": "resources/icons/antigravity.svg"
+        }
+      ]
+    },
+    "views": {
+      "antigravity-skills": [
+        {
+          "id": "antigravitySkillsTree",
+          "name": "Skills",
+          "icon": "resources/icons/antigravity.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "antigravity.refreshSkills",
+        "title": "Refresh Skills",
+        "category": "Antigravity",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "antigravity.openSkillFile",
+        "title": "Open Raw Skill File",
+        "category": "Antigravity",
+        "icon": "$(go-to-file)"
+      },
+      {
+        "command": "antigravity.viewSkill",
+        "title": "View Skill",
+        "category": "Antigravity"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "antigravity.refreshSkills",
+          "when": "view == antigravitySkillsTree",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "antigravity.openSkillFile",
+          "when": "view == antigravitySkillsTree && viewItem == skill",
+          "group": "inline"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "antigravitySkillsTree",
+        "contents": "No Antigravity skills found.\nMake sure Antigravity plugins are installed in ~/.gemini/config/plugins\n[Refresh](command:antigravity.refreshSkills)"
+      }
+    ]
+  },
+  "scripts": {
+    "test": "echo \"No tests configured\""
+  }
+}
